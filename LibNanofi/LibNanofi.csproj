@@ -72,6 +72,11 @@ namespace $(RootNamespace)
     <RemoveDir Directories="$(GameLibraryPath)" /> 
   </Target>
 
+  <Target Name="BumpVersion" BeforeTargets="BeforeBuild" Condition="'$(PublishProtocol)' == 'FileSystem'">
+    <MakeBumpedVersionCommit RootDir="$(SolutionDir)">
+      <Output TaskParameter="NextVersion" PropertyName="NextPublishVersion" />
+    </MakeBumpedVersionCommit>
+  </Target>
   
   <Target Name="ZipPublishedItems" AfterTargets="Publish" DependsOnTargets="CleanPublishedZip">
     <PropertyGroup>
