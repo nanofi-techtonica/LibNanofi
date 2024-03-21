@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,5 +10,66 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LibNanofi.Build\LibNanofi.Build.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+  </ItemGroup>
+
+  <UsingTask TaskName="GatherGameAssemblies" TaskFactory="TaskHostFactory" AssemblyFile="$(SolutionDir)LibNanofi.Build\bin\$(Configuration)\netstandard2.0\LibNanofi.Build.dll" />
+  <UsingTask TaskName="MakeBumpedVersionCommit" TaskFactory="TaskHostFactory" AssemblyFile="$(SolutionDir)LibNanofi.Build\bin\$(Configuration)\netstandard2.0\LibNanofi.Build.dll" />
+
+  <Target Name="GeneratePluginInfo" BeforeTargets="BeforeCompile;CoreCompile" Inputs="$(MSBuildAllProjects)" Outputs="$(IntermediateOutputPath)PluginInfo.g.cs">
+    <PropertyGroup>
+      <BepInExPluginGuid Condition="'$(BepInExPluginGuid)' == ''">$(AssemblyName)</BepInExPluginGuid>
+      <BepInExPluginName Condition="'$(BepInExPluginName)' == ''">$(Product)</BepInExPluginName>
+      <BepInExPluginVersion Condition="'$(BepInExPluginVersion)' == ''">$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</BepInExPluginVersion>
+      <PluginInfoCode><![CDATA[
+namespace $(RootNamespace)
+{
+    internal static class PluginInfo
+    {
+        public const string GUID = "$(BepInExPluginGuid)"%3B
+        public const string NAME = "$(BepInExPluginName)"%3B
+        public const string VERSION = "$(BepInExPluginVersion)"%3B
+    }
+}
+      ]]></PluginInfoCode>
+      <PluginInfoPath>$(IntermediateOutputPath)PluginInfo.g.cs</PluginInfoPath>
+    </PropertyGroup>
+    <ItemGroup>
+      <Compile Include="$(PluginInfoPath)" />
+      <FileWrites Include="$(PluginInfoPath)" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(PluginInfoPath)" Lines="$(PluginInfoCode)" WriteOnlyWhenDifferent="true" Overwrite="true" />
+  </Target>
+
+  <PropertyGroup>
+    <GameConfigPath>..\game.json</GameConfigPath>
+    <GameLibraryPath>Library</GameLibraryPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <GameDependency Include="$(GameLibraryPath)\UnityEngine.dll" />
+    <GameDependency Include="$(GameLibraryPath)\UnityEngine.CoreModule.dll" />
+    <GameDependency Include="$(GameLibraryPath)\BepInEx.dll" />
+    <GameDependency Include="$(GameLibraryPath)\0Harmony.dll" />
+    <GameDependency Include="$(GameLibraryPath)\BepInEx.Harmony.dll" />
+    <GameDependency Include="$(GameLibraryPath)\Assembly-CSharp.dll" />
+  </ItemGroup>
+  <ItemGroup>    
+    <Reference Include="@(GameDependency)" Private="False" SpecificVersion="false" />
+  </ItemGroup>
+  
+  <Target Name="ResolveGameDependencies" BeforeTargets="ResolveAssemblyReferences" Inputs="$(GameConfigPath)" Outputs="$(GameLibraryPath)">
+    <Message Importance="normal" Text="Resolving game dependencies" />
+    <GatherGameAssemblies Dependencies="@(GameDependency)" ConfigPath="$(SolutionDir)game.json" />
+    <ItemGroup>
+      <Reference Update="@(GameDependency)" Private="False" SpecificVersion="false" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="CleanGameDependencies" AfterTargets="Clean">
+    <Message Importance="normal" Text="Cleaning game dependencies" />
+    <RemoveDir Directories="$(GameLibraryPath)" /> 
+  </Target>
 
 </Project>

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "LibNanofi.Build": {
+      "commandName": "Project"
+    },
+    "LibNanofi.Build Generator": {
+      "commandName": "DebugRoslynComponent"
+    }
+  }
+}
