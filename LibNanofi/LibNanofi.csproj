@@ -72,4 +72,16 @@ namespace $(RootNamespace)
     <RemoveDir Directories="$(GameLibraryPath)" /> 
   </Target>
 
+  
+  <Target Name="ZipPublishedItems" AfterTargets="Publish" DependsOnTargets="CleanPublishedZip">
+    <PropertyGroup>
+      <PublishedZipPath>$(PublishDir)../$(MSBuildProjectName).zip</PublishedZipPath>
+    </PropertyGroup>
+    <ZipDirectory SourceDirectory="$(PublishDir)" DestinationFile="$(PublishedZipPath)" />
+    <RemoveDir Directories="$(PublishDir)" />
+  </Target>
+
+  <Target Name="CleanPublishedZip">
+    <Delete Files="$(PublishDir)../$(MSBuildProjectName).zip" />
+  </Target>
 </Project>
