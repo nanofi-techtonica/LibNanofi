@@ -17,7 +17,9 @@ namespace LibNanofi.Build
                     FileName = command,
                     Arguments = args,
                     RedirectStandardOutput = true,
+                    StandardOutputEncoding = Encoding.UTF8,
                     RedirectStandardError = true,
+                    StandardErrorEncoding = Encoding.UTF8,
                     CreateNoWindow = true,
                     UseShellExecute = false,
                     WorkingDirectory = workingDir,
@@ -34,6 +36,12 @@ namespace LibNanofi.Build
                 }
                 return result;
             }
+        }
+
+        public static T WaitAndReturn<T>(this System.Threading.Tasks.Task<T> task)
+        {
+            task.Wait();
+            return task.Result;
         }
     }
 }
