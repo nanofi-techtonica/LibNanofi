@@ -19,6 +19,8 @@
 
   <UsingTask TaskName="GatherGameAssemblies" TaskFactory="TaskHostFactory" AssemblyFile="$(SolutionDir)LibNanofi.Build\bin\$(Configuration)\netstandard2.0\LibNanofi.Build.dll" />
   <UsingTask TaskName="MakeBumpedVersionCommit" TaskFactory="TaskHostFactory" AssemblyFile="$(SolutionDir)LibNanofi.Build\bin\$(Configuration)\netstandard2.0\LibNanofi.Build.dll" />
+  <UsingTask TaskName="CreateGitTag" TaskFactory="TaskHostFactory" AssemblyFile="$(SolutionDir)LibNanofi.Build\bin\$(Configuration)\netstandard2.0\LibNanofi.Build.dll" />
+  <UsingTask TaskName="CreateRelease" TaskFactory="TaskHostFactory" AssemblyFile="$(SolutionDir)LibNanofi.Build\bin\$(Configuration)\netstandard2.0\LibNanofi.Build.dll" />
 
   <Target Name="GeneratePluginInfo" BeforeTargets="BeforeCompile;CoreCompile" Inputs="$(MSBuildAllProjects)" Outputs="$(IntermediateOutputPath)PluginInfo.g.cs">
     <PropertyGroup>
@@ -77,13 +79,21 @@ namespace $(RootNamespace)
     <RemoveDir Directories="$(GameLibraryPath)" /> 
   </Target>
 
-  <Target Name="BumpVersion" BeforeTargets="BeforeBuild" Condition="'$(PublishProtocol)' == 'FileSystem'">
-    <MakeBumpedVersionCommit RootDir="$(SolutionDir)">
+  <PropertyGroup>
+    <GitRemote>origin</GitRemote>
+  </PropertyGroup>
+
+  <Target Name="BumpVersion">
+    <MakeBumpedVersionCommit RootDir="$(SolutionDir)" Push="True" Remote="$(GitRemote)">
       <Output TaskParameter="NextVersion" PropertyName="NextPublishVersion" />
     </MakeBumpedVersionCommit>
   </Target>
+
+  <Target Name="TagVersion" BeforeTargets="BeforeBuild" DependsOnTargets="BumpVersion" Condition="'$(PublishProtocol)' == 'FileSystem'">
+    <CreateGitTag RootDir="$(SolutionDir)" Name="v$(NextPublishVersion)" Push="True" Remote="$(GitRemote)" />
+  </Target>
   
-  <Target Name="ZipPublishedItems" AfterTargets="Publish" DependsOnTargets="CleanPublishedZip">
+  <Target Name="ZipPublishedItems" DependsOnTargets="CleanPublishedZip" Inputs="$(PublishDir)" Outputs="$(PublishDir)../$(MSBuildProjectName).zip">
     <PropertyGroup>
       <PublishedZipPath>$(PublishDir)../$(MSBuildProjectName).zip</PublishedZipPath>
     </PropertyGroup>
@@ -93,5 +103,14 @@ namespace $(RootNamespace)
 
   <Target Name="CleanPublishedZip">
     <Delete Files="$(PublishDir)../$(MSBuildProjectName).zip" />
+  </Target>
+
+  <Target Name="CreateRelease" AfterTargets="Publish" DependsOnTargets="TagVersion;ZipPublishedItems">
+    <CreateRelease 
+      RootDir="$(SolutionDir)" 
+      ConfigPath="$(SolutionDir)$(BuildConfigPath)" 
+      Artifacts="$(PublishDir)../$(MSBuildProjectName).zip" 
+      Version="$(NextPublishVersion)" 
+      GitRemote="$(GitRemote)" />
   </Target>
 </Project>
