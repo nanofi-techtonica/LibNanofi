@@ -44,7 +44,10 @@ namespace $(RootNamespace)
   </Target>
 
   <PropertyGroup>
-    <GameConfigPath>..\game.json</GameConfigPath>
+    <BuildConfigPath>build.json</BuildConfigPath>
+  </PropertyGroup>
+  
+  <PropertyGroup>
     <GameLibraryPath>Library</GameLibraryPath>
   </PropertyGroup>
   <ItemGroup>
@@ -59,9 +62,9 @@ namespace $(RootNamespace)
     <Reference Include="@(GameDependency)" Private="False" SpecificVersion="false" />
   </ItemGroup>
   
-  <Target Name="ResolveGameDependencies" BeforeTargets="ResolveAssemblyReferences" Inputs="$(GameConfigPath)" Outputs="$(GameLibraryPath)">
+  <Target Name="ResolveGameDependencies" BeforeTargets="ResolveAssemblyReferences" Inputs="$(SolutionDir)$(BuildConfigPath)" Outputs="$(ProjectDir)$(GameLibraryPath)">
     <Message Importance="normal" Text="Resolving game dependencies" />
-    <GatherGameAssemblies Dependencies="@(GameDependency)" ConfigPath="$(SolutionDir)game.json" />
+    <GatherGameAssemblies Dependencies="@(GameDependency)" ConfigPath="$(SolutionDir)$(BuildConfigPath)" />
     <ItemGroup>
       <Reference Update="@(GameDependency)" Private="False" SpecificVersion="false" />
     </ItemGroup>
