@@ -11,14 +11,14 @@ namespace LibNanofi.Build.Tasks
     public class GatherGameAssemblies : Task
     {
         [Required]
-        public string ConfigPath { get; set; }
+        public string ConfigPath { get; set; } = "";
 
         [Required]
-        public ITaskItem[] Dependencies { get; set; }
+        public ITaskItem[] Dependencies { get; set; } = new ITaskItem[0];
 
         [Output]
         public ITaskItem[] CopiedAssemblies => _copiedAssemblies;
-        private ITaskItem[] _copiedAssemblies;
+        private ITaskItem[] _copiedAssemblies = new ITaskItem[0];
 
         public override bool Execute()
         {
@@ -38,7 +38,7 @@ namespace LibNanofi.Build.Tasks
                     var name = dep.GetMetadata("FileName");
                     Log.LogMessage(MessageImportance.Normal, $"Checking {name}");
                     var path = FindGameAssembly(config, name);
-                    if(path != null)
+                    if (path != null)
                     {
                         Log.LogMessage(MessageImportance.Normal, $"Found {name} at {path}");
                     }

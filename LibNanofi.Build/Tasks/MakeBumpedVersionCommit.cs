@@ -10,10 +10,10 @@ namespace LibNanofi.Build.Tasks
     public class MakeBumpedVersionCommit : Task
     {
         [Required]
-        public string RootDir { get; set; }
+        public string RootDir { get; set; } = "";
         public string ChangelogFile { get; set; } = "CHANGELOG.md";
         [Output]
-        public string NextVersion { get; set; }
+        public string NextVersion { get; set; } = "0.1.0";
 
         public override bool Execute()
         {
