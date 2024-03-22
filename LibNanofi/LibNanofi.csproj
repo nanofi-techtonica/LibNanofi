@@ -61,14 +61,14 @@ namespace $(RootNamespace)
     <GameDependency Include="$(GameLibraryPath)\Assembly-CSharp.dll" />
   </ItemGroup>
   <ItemGroup>    
-    <Reference Include="@(GameDependency)" Private="False" SpecificVersion="false" />
+    <Reference Include="@(GameDependency)" Private="False" SpecificVersion="False" />
   </ItemGroup>
   
   <Target Name="ResolveGameDependencies" BeforeTargets="ResolveAssemblyReferences" Inputs="$(SolutionDir)$(BuildConfigPath)" Outputs="$(ProjectDir)$(GameLibraryPath)">
     <Message Importance="normal" Text="Resolving game dependencies" />
     <GatherGameAssemblies Dependencies="@(GameDependency)" ConfigPath="$(SolutionDir)$(BuildConfigPath)" />
     <ItemGroup>
-      <Reference Update="@(GameDependency)" Private="False" SpecificVersion="false" />
+      <Reference Update="@(GameDependency)" Private="False" SpecificVersion="False" />
     </ItemGroup>
   </Target>
 
