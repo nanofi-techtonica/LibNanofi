@@ -10,8 +10,8 @@ namespace LibNanofi
     [BepInPlugin(PluginInfo.GUID, PluginInfo.NAME, PluginInfo.VERSION)]
     public class Plugin: BaseUnityPlugin
     {
-        internal static new ManualLogSource Logger;
-        internal static new ConfigFile Config;
+        internal static new ManualLogSource? Logger;
+        internal static new ConfigFile? Config;
 
         void Awake()
         {
