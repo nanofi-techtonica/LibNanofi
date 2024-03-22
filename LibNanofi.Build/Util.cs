@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Text;
 
@@ -34,6 +35,5 @@ namespace LibNanofi.Build
                 return result;
             }
         }
-
     }
 }

@@ -72,7 +72,7 @@ namespace LibNanofi.Build.Tasks
             return !Log.HasLoggedErrors;
         }
 
-        private string FindGameAssembly(Config config, string assemblyName)
+        private string? FindGameAssembly(Config config, string assemblyName)
         {
             var assemblyPath = Path.Combine(config.GameRoot, "Techtonica_Data", "Managed", $"{assemblyName}.dll");
             if (File.Exists(assemblyPath))
